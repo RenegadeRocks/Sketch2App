@@ -1,0 +1,7 @@
+{
+  "pageName": "LoginPage",
+  "files": [
+    { "path": "app/page.tsx", "contents": "export default function Page(){return <div>Hi</div>}", "role": "page" },
+    { "path": "components/LoginForm.tsx", "contents": "export function LoginForm(){return <form/>}", "role": "component" }
+  ]
+}
