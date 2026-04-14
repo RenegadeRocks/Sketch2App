@@ -12,20 +12,43 @@
 
 ---
 
-## Conventions
+## Stack Reality (as built in Phase 0)
 
-- All commands run from the project root: `D:\Work\ClaudeCode\Sketch2App`.
-- Package manager: **pnpm** (fast, disk-efficient, stable workspaces if we ever split). Fall back to `npm` if pnpm isn't available.
-- Path alias: `@/*` → `./src/*` (Next.js default with `--src-dir`).
-- Tests live in `tests/` at project root, mirroring `src/` structure. Vitest resolves both.
-- Commit after every passing task. Conventional Commits format (`feat:`, `test:`, `chore:`, `fix:`).
-- Every TDD task follows: **write failing test → verify fails → minimal impl → verify passes → commit**.
+The plan was written against a Next 15 / Tailwind v3 assumption; what actually scaffolded on 2026-04-14 was newer. All later phases must use these realities, not what the original task bodies say:
+
+| Plan assumed | Reality |
+|---|---|
+| pnpm | **npm** (pnpm not installed — every `pnpm X` in later tasks = `npm run X` or `npx X`) |
+| Next.js 15 | **Next.js 16.2.3** (App Router, Turbopack on by default for `next build`) |
+| React 19 | React 19.2.4 |
+| Tailwind **v3** + `tailwind.config.ts` | **Tailwind v4** + CSS-based `@theme inline { ... }` in `src/app/globals.css`. **No `tailwind.config.ts` exists or should be created.** Any later task that says "edit `tailwind.config.ts`" means "edit the `@theme` block in `globals.css`." |
+| shadcn style = `new-york` | **shadcn style = `base-nova`** (v4 default). Components use `@base-ui/react` primitives in most places; `@radix-ui/react-slot` is still used for `Button` `asChild` via transitive install. |
+| shadcn init — `--base-color neutral` flag | Use `npx shadcn@latest init --yes` (then `--defaults`). Already done. |
+| `@tldraw/tldraw` | `@tldraw/tldraw@^4.5.8` (scoped name still works — plan was correct). |
+
+Bauhaus tokens (colors, shadows, binary radii) are exposed via `@theme` in `globals.css` — `bg-bauhaus-red`, `shadow-bauhaus`, `rounded-none`, etc. work as Tailwind utilities exactly as planned.
+
+Phase 0 note: smoke-test webServer runs `npm run dev` (not `pnpm dev`). Windows machines leak `next dev` processes on ports 3000/3002 between runs — if a phase-6 E2E test hangs on startup, `taskkill //PID <pid> //F` and `rm -rf .next/dev` before retrying.
 
 ---
 
-## Phase 0 — Project Scaffolding (Tasks 1–8)
+## Conventions
 
-### Task 1: Bootstrap Next.js project, initialize git
+- All commands run from the project root: `D:\Work\ClaudeCode\Sketch2App`.
+- Package manager: **npm**. Every plan command that says `pnpm X` should be translated: `pnpm add` → `npm install`, `pnpm add -D` → `npm install -D`, `pnpm X` (script) → `npm run X`, `pnpm dlx` → `npx`, `pnpm exec` → `npx`.
+- Path alias: `@/*` → `./src/*`.
+- Tests live in `tests/` at project root, mirroring `src/` structure. Vitest resolves both.
+- Commit after every passing task. Conventional Commits format (`feat:`, `test:`, `chore:`, `fix:`).
+- Every TDD task follows: **write failing test → verify fails → minimal impl → verify passes → commit**.
+- Line endings: the repo is on Windows; git shows `LF will be replaced by CRLF` warnings — benign.
+
+---
+
+## Phase 0 — Project Scaffolding (Tasks 1–8) ✅ COMPLETED 2026-04-14
+
+> Phase 0 is done and committed (commits `18eb7c5` through `8d43a94`). Tasks below are retained for the audit trail but are not action items. Note divergences captured in "Stack Reality" above.
+
+### Task 1: Bootstrap Next.js project, initialize git ✅
 
 **Files:**
 - Create: entire project skeleton under `D:\Work\ClaudeCode\Sketch2App\`
@@ -93,7 +116,7 @@ git commit -m "chore: add .superpowers and OS cruft to gitignore"
 
 ---
 
-### Task 2: Install core runtime dependencies
+### Task 2: Install core runtime dependencies ✅
 
 **Files:**
 - Modify: `package.json`, `pnpm-lock.yaml`
@@ -133,7 +156,7 @@ git commit -m "chore: install runtime and test dependencies"
 
 ---
 
-### Task 3: Initialize shadcn/ui and install primitive components
+### Task 3: Initialize shadcn/ui and install primitive components ✅
 
 **Files:**
 - Create: `components.json`, `src/components/ui/*`, `src/lib/utils.ts`
@@ -171,7 +194,7 @@ git commit -m "feat: init shadcn/ui with required primitives"
 
 ---
 
-### Task 4: Load Outfit font via next/font
+### Task 4: Load Outfit font via next/font ✅
 
 **Files:**
 - Modify: `src/app/layout.tsx`
@@ -249,7 +272,7 @@ git commit -m "feat: load Outfit font via next/font"
 
 ---
 
-### Task 5: Define Bauhaus theme tokens
+### Task 5: Define Bauhaus theme tokens ✅ (adapted for Tailwind v4)
 
 **Files:**
 - Modify: `src/app/globals.css`, `tailwind.config.ts`
@@ -378,7 +401,7 @@ git commit -m "feat: define Bauhaus theme tokens and utilities"
 
 ---
 
-### Task 6: Override shadcn Button with Bauhaus variants
+### Task 6: Override shadcn Button with Bauhaus variants ✅
 
 **Files:**
 - Modify: `src/components/ui/button.tsx`
@@ -541,7 +564,7 @@ git commit -m "feat: Bauhaus variants for Button + vitest config"
 
 ---
 
-### Task 7: Add typecheck and lint scripts, confirm CI-ready
+### Task 7: Add typecheck and lint scripts, confirm CI-ready ✅
 
 **Files:**
 - Modify: `package.json`
@@ -573,7 +596,7 @@ git commit -m "chore: add typecheck and strict lint scripts"
 
 ---
 
-### Task 8: Playwright config + smoke test
+### Task 8: Playwright config + smoke test ✅
 
 **Files:**
 - Create: `playwright.config.ts`, `tests/e2e/smoke.spec.ts`
