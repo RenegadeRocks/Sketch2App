@@ -1,0 +1,6 @@
+{
+  "shapes": [
+    { "type": "geo", "id": "v1", "x": 50, "y": 50, "w": 400, "h": 60, "props": { "geo": "rectangle", "text": "HEADER" } },
+    { "type": "text", "id": "v2", "x": 60, "y": 70, "props": { "text": "Welcome", "size": "l" } }
+  ]
+}
