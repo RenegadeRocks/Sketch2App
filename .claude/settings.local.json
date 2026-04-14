@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(ls D:/Work/ClaudeCode/*.md)",
+      "Bash(mv D:/Work/ClaudeCode/CLAUDE.md D:/Work/ClaudeCode/Sketch2App/CLAUDE.md)",
+      "Read(//d/Work/ClaudeCode/**)",
+      "WebFetch(domain:github.com)",
+      "Bash(bash:*)"
+    ]
+  }
+}

@@ -1,0 +1,98 @@
+<h2>Which main-screen layout?</h2>
+<p class="subtitle">Both show the same three surfaces (input, chat, preview). They differ in how the surfaces compete for attention.</p>
+
+<style>
+  .mock-panel { border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 12px; background: rgba(255,255,255,0.03); display: flex; flex-direction: column; min-height: 100%; }
+  .mock-panel h4 { margin: 0 0 8px; font-size: 12px; opacity: 0.7; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+  .mock-canvas { flex: 1; background: repeating-linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.02) 8px, rgba(255,255,255,0.04) 8px, rgba(255,255,255,0.04) 16px); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; opacity: 0.5; min-height: 150px; }
+  .mock-chat { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 6px; font-size: 11px; }
+  .mock-chat .bubble { padding: 6px 8px; border-radius: 6px; background: rgba(255,255,255,0.06); max-width: 85%; }
+  .mock-chat .bubble.user { background: rgba(100,150,255,0.15); align-self: flex-end; }
+  .mock-chat input { margin-top: 8px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 6px; font-size: 11px; color: inherit; }
+  .mock-preview { flex: 1; background: rgba(255,255,255,0.05); border-radius: 4px; padding: 8px; font-size: 10px; display: flex; flex-direction: column; gap: 4px; min-height: 150px; }
+  .mock-preview .tab-row { display: flex; gap: 4px; margin-bottom: 6px; }
+  .mock-preview .tab { padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.05); font-size: 10px; }
+  .mock-preview .tab.active { background: rgba(100,150,255,0.25); }
+  .mock-preview .rendered { flex: 1; background: white; border-radius: 4px; padding: 12px; color: #333; }
+</style>
+
+<div class="cards">
+  <div class="card" data-choice="three-col" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1.2fr; gap: 8px; height: 260px;">
+        <div class="mock-panel">
+          <h4>Sketch</h4>
+          <div class="mock-canvas">tldraw canvas</div>
+          <div style="margin-top: 6px; font-size: 10px; opacity: 0.6;">📷 upload photo</div>
+        </div>
+        <div class="mock-panel">
+          <h4>Refine</h4>
+          <div class="mock-chat">
+            <div class="bubble">Generated LoginPage.tsx + 3 components.</div>
+            <div class="bubble user">Make header smaller</div>
+            <div class="bubble">Updating…</div>
+            <input placeholder="Describe a change…">
+          </div>
+        </div>
+        <div class="mock-panel">
+          <h4>Result</h4>
+          <div class="mock-preview">
+            <div class="tab-row">
+              <div class="tab active">Preview</div>
+              <div class="tab">Code</div>
+            </div>
+            <div class="rendered">
+              <div style="font-weight: 600; font-size: 10px;">Welcome back</div>
+              <div style="height: 12px; background: #eee; margin: 6px 0; border-radius: 2px;"></div>
+              <div style="height: 12px; background: #eee; margin: 6px 0; border-radius: 2px;"></div>
+              <div style="height: 16px; background: #3b82f6; border-radius: 2px; margin-top: 8px;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. Three-column</h3>
+      <p>Sketch · Chat · Preview, all visible at once. Nothing is hidden. Works at desktop widths (1200px+); gets cramped on laptops.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="two-col" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding: 12px;">
+      <div style="display: grid; grid-template-columns: 1fr 1.4fr; gap: 8px; height: 260px;">
+        <div class="mock-panel">
+          <h4>Sketch</h4>
+          <div class="mock-canvas">tldraw canvas</div>
+          <div style="margin-top: 6px; font-size: 10px; opacity: 0.6;">📷 upload photo</div>
+        </div>
+        <div class="mock-panel">
+          <h4>Result & Refine</h4>
+          <div class="mock-preview" style="flex: 1.5;">
+            <div class="tab-row">
+              <div class="tab active">Preview</div>
+              <div class="tab">Code</div>
+            </div>
+            <div class="rendered">
+              <div style="font-weight: 600; font-size: 10px;">Welcome back</div>
+              <div style="height: 12px; background: #eee; margin: 6px 0; border-radius: 2px;"></div>
+              <div style="height: 12px; background: #eee; margin: 6px 0; border-radius: 2px;"></div>
+              <div style="height: 16px; background: #3b82f6; border-radius: 2px; margin-top: 8px;"></div>
+            </div>
+          </div>
+          <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; margin-top: 8px;">
+            <div class="mock-chat" style="max-height: 70px;">
+              <div class="bubble user" style="font-size: 10px;">Make header smaller</div>
+              <input placeholder="Describe a change…">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. Two-column, chat docked under preview</h3>
+      <p>Sketch on the left. Preview+code tabs get the big real estate; chat is a compact strip at the bottom. Less cramped on laptops.</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 16px;">Recommendation: <strong>B</strong> — the preview is the "wow" moment, it deserves the space. Chat is mostly short-form and doesn't need a full column.</p>
