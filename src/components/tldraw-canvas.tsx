@@ -9,6 +9,7 @@ export function TldrawCanvas() {
   const { setCanvasShapes } = useProject();
 
   const onMount = useCallback((editor: Editor) => {
+    (window as any).__TLDRAW_EDITOR__ = editor;
     const sync = () => {
       const snapshot = editor.getSnapshot();
       setCanvasShapes(convertTldrawSnapshotToShapes({ store: snapshot.document.store as any }));
