@@ -1,27 +1,30 @@
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
+import { ApiKeyProvider } from "@/contexts/api-key-context";
+import { ModelProvider } from "@/contexts/model-context";
+import { ProjectProvider } from "@/contexts/project-context";
 import "./globals.css";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
-  variable: "--font-outfit",
-});
+const outfit = Outfit({ subsets: ["latin"], weight: ["400", "500", "700", "900"], variable: "--font-outfit" });
 
 export const metadata: Metadata = {
   title: "Sketch2App",
   description: "Hand-drawn or digital wireframes into production React code.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={outfit.variable}>
-      <body className="font-sans antialiased">
-        {children}
+      <body className="font-sans antialiased bg-background text-foreground">
+        <ApiKeyProvider>
+          <ModelProvider>
+            <ProjectProvider>
+              {children}
+              <Toaster position="top-center" />
+            </ProjectProvider>
+          </ModelProvider>
+        </ApiKeyProvider>
       </body>
     </html>
   );
