@@ -9,6 +9,7 @@ export default defineConfig({
     globals: true,
     clearMocks: true,
     setupFiles: ["./tests/setup.ts"],
+    exclude: ["**/node_modules/**", "**/tests/e2e/**"],
   },
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
