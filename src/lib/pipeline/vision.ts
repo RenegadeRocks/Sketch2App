@@ -2,6 +2,7 @@ import { z } from "zod";
 import { CanvasShapeSchema, type CanvasShape } from "@/lib/schemas";
 import { buildVisionMessages } from "@/lib/prompts/vision";
 import { callOpenRouter } from "@/lib/openrouter";
+import { extractJson } from "@/lib/extract-json";
 
 export interface NormalizePhotoOptions {
   imageDataUrl: string;
@@ -23,7 +24,7 @@ async function attempt(opts: NormalizePhotoOptions): Promise<CanvasShape[]> {
   const content = await callOpenRouter({
     apiKey: opts.apiKey, model: opts.model, messages, responseFormat: "json_object",
   });
-  const parsed = VisionResponseSchema.parse(JSON.parse(content));
+  const parsed = VisionResponseSchema.parse(extractJson(content));
   if (parsed.shapes.length === 0) throw new VisionError("no shapes detected");
   return parsed.shapes;
 }

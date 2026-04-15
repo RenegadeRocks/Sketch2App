@@ -1,5 +1,9 @@
 "use client";
-import { Sandpack } from "@codesandbox/sandpack-react";
+import {
+  SandpackProvider,
+  SandpackLayout,
+  SandpackPreview as SandpackPreviewPane,
+} from "@codesandbox/sandpack-react";
 import type { GeneratedProject } from "@/lib/schemas";
 import { projectToSandpackFiles } from "@/lib/sandpack-files";
 
@@ -14,16 +18,23 @@ export function SandpackPreview({ project }: Props) {
     );
   }
   return (
-    <Sandpack
+    <SandpackProvider
       template="react-ts"
       files={projectToSandpackFiles(project)}
-      options={{
-        showTabs: false, showLineNumbers: false, showNavigator: false,
-        editorHeight: "100%", classes: { "sp-wrapper": "!border-2 !border-bauhaus-black !rounded-none" },
-      }}
       customSetup={{
         dependencies: { "react": "^18.2.0", "react-dom": "^18.2.0", "lucide-react": "^0.454.0" },
       }}
-    />
+      options={{ classes: { "sp-wrapper": "!border-2 !border-bauhaus-black !rounded-none !h-full" } }}
+    >
+      <SandpackLayout style={{ height: "100%" }}>
+        <SandpackPreviewPane
+          showNavigator={false}
+          showRefreshButton
+          showOpenInCodeSandbox={false}
+          showSandpackErrorOverlay
+          style={{ height: "100%", minHeight: "100%", flex: 1 }}
+        />
+      </SandpackLayout>
+    </SandpackProvider>
   );
 }

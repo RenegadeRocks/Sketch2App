@@ -1,6 +1,7 @@
 import { GeneratedProjectSchema, type CanvasShape, type GeneratedProject } from "@/lib/schemas";
 import { buildCodegenMessages } from "@/lib/prompts/codegen";
 import { callOpenRouter } from "@/lib/openrouter";
+import { extractJson } from "@/lib/extract-json";
 
 export interface RunCodegenOptions {
   shapes: CanvasShape[];
@@ -27,13 +28,13 @@ async function attempt(opts: RunCodegenOptions, retryNote?: string): Promise<Gen
   const content = await callOpenRouter({
     apiKey: opts.apiKey, model: opts.model, messages, responseFormat: "json_object",
   });
-  const parsed = JSON.parse(content);
+  const parsed = extractJson(content);
   try {
     return GeneratedProjectSchema.parse(parsed);
   } catch (schemaErr) {
     if (opts.currentProject) {
       const { mergeWithPreservedPage } = await import("@/lib/pipeline/iterate");
-      const salvaged = mergeWithPreservedPage(parsed, opts.currentProject);
+      const salvaged = mergeWithPreservedPage(parsed as { pageName: string; files: GeneratedProject["files"] }, opts.currentProject);
       return GeneratedProjectSchema.parse(salvaged);
     }
     throw schemaErr;

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Send, Sparkles } from "lucide-react";
+import { Send, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -37,18 +37,24 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
     try {
       let shapes = canvasShapes;
       if (mode === "photo" && photoDataUrl) {
+        console.log("[sketch2app] vision step: normalizing photo → shapes");
         shapes = await normalizePhotoToShapes({ imageDataUrl: photoDataUrl, apiKey, model: model.id });
+        console.log("[sketch2app] vision returned", shapes.length, "shapes", shapes);
       }
+      console.log("[sketch2app] codegen step: generating with", shapes.length, "shapes");
       const result = await runCodegen({ shapes, apiKey, model: model.id });
+      console.log("[sketch2app] codegen returned", result);
       setProject(result);
       markCanvasClean();
       onGenerated();
       toast.success("Generated!");
     } catch (e: any) {
-      if (e?.status === 401) { toast.error("OpenRouter rejected your key."); onOpenKeyDialog(); }
-      else if (e?.status === 402) { toast.error("Out of OpenRouter credits — top up at openrouter.ai/credits"); }
-      else if (e?.status === 429) { toast.error("Rate limited — wait a moment."); }
-      else { toast.error(e?.message ?? "Generation failed"); }
+      console.error("[sketch2app] generation failed", e);
+      const msg = e?.message ?? String(e);
+      if (e?.status === 401) { toast.error("OpenRouter rejected your key.", { duration: 10000 }); onOpenKeyDialog(); }
+      else if (e?.status === 402) { toast.error("Out of OpenRouter credits — top up at openrouter.ai/credits", { duration: 10000 }); }
+      else if (e?.status === 429) { toast.error("Rate limited — wait a moment.", { duration: 10000 }); }
+      else { toast.error(`Generation failed: ${msg}`, { duration: 20000 }); }
     } finally { setBusy(false); }
   };
 
@@ -76,10 +82,20 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
       <div className="border-b-4 border-bauhaus-black p-3 flex items-center justify-between">
         <span className="bauhaus-label">Refine</span>
         <Button onClick={runGenerate} disabled={!canGenerate} size="sm">
-          <Sparkles className="w-4 h-4 mr-2" strokeWidth={3} />
-          {project ? "Regenerate" : "Generate"}
+          {busy ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" strokeWidth={3} />
+          ) : (
+            <Sparkles className="w-4 h-4 mr-2" strokeWidth={3} />
+          )}
+          {busy ? "Generating…" : project ? "Regenerate" : "Generate"}
         </Button>
       </div>
+      {busy && (
+        <div className="border-b-2 border-bauhaus-black bg-bauhaus-yellow px-3 py-2 flex items-center gap-2">
+          <Loader2 className="w-4 h-4 animate-spin" strokeWidth={3} />
+          <span className="bauhaus-label">Generating… this can take 30–120 seconds. Do not reload.</span>
+        </div>
+      )}
       <div className="flex-1 overflow-auto p-3 space-y-2 text-sm">
         {chatHistory.map((m, i) => (
           <div key={i} className={`border-2 border-bauhaus-black p-2 max-w-[90%] ${m.role === "user" ? "bg-bauhaus-blue/10 ml-auto" : "bg-muted"}`}>

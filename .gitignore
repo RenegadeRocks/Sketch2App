@@ -44,3 +44,9 @@ next-env.d.ts
 .superpowers/
 .DS_Store
 Thumbs.db
+
+# playwright / MCP browser artifacts (local debug only)
+/test-results/
+/playwright-report/
+/.playwright-mcp/
+/*.png
