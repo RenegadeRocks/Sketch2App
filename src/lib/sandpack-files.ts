@@ -5,7 +5,14 @@ type SandpackFiles = Record<string, { code: string }>;
 
 const INDEX_HTML = `<!DOCTYPE html>
 <html>
-  <head><meta charset="UTF-8" /><title>Preview</title></head>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Preview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body { margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    </style>
+  </head>
   <body><div id="root"></div></body>
 </html>`;
 
@@ -13,6 +20,16 @@ const INDEX_ENTRY = `
 import React from "react";
 import { createRoot } from "react-dom/client";
 import Page from "./page";
+
+if (!document.getElementById("__sketch2app_tw")) {
+  const s = document.createElement("script");
+  s.id = "__sketch2app_tw";
+  s.src = "https://cdn.tailwindcss.com";
+  document.head.appendChild(s);
+}
+document.body.style.margin = "0";
+document.documentElement.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+
 const el = document.getElementById("root");
 if (el) createRoot(el).render(<Page />);
 `.trim();

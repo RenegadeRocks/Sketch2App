@@ -14,7 +14,7 @@ export function MainLayout({ onOpenKeyDialog }: Props) {
 
   return (
     <main className="h-[calc(100vh-80px)] grid grid-cols-[minmax(340px,1fr)_minmax(480px,1.4fr)] gap-4 p-4 bg-background">
-      <InputPanel mode={mode} onModeChange={setMode} onPhoto={setPhotoDataUrl} canvasDirty={canvasDirty} />
+      <InputPanel mode={mode} onModeChange={setMode} onPhoto={setPhotoDataUrl} showDirtyBadge={!!project && canvasDirty} />
       <div className="grid grid-rows-[1fr_280px] gap-4 min-h-0">
         <ResultPanel project={project} />
         <ChatPanel mode={mode} photoDataUrl={photoDataUrl} onOpenKeyDialog={onOpenKeyDialog} onGenerated={() => {}} />

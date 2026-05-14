@@ -4,6 +4,37 @@ interface TldrawSnapshot {
   store: Record<string, any>;
 }
 
+interface TipTapNode {
+  type?: string;
+  text?: string;
+  content?: TipTapNode[];
+}
+
+function extractText(value: unknown): string | undefined {
+  if (typeof value === "string") {
+    return value.trim() || undefined;
+  }
+  if (!value || typeof value !== "object") return undefined;
+  const v = value as TipTapNode;
+  if (v.type === "text" && typeof v.text === "string") {
+    return v.text || undefined;
+  }
+  if (Array.isArray(v.content)) {
+    const parts: string[] = [];
+    for (const child of v.content) {
+      const t = extractText(child);
+      if (t) parts.push(t);
+    }
+    const joined = parts.join("\n").trim();
+    return joined || undefined;
+  }
+  return undefined;
+}
+
+function resolveText(props: any): string | undefined {
+  return extractText(props?.text) ?? extractText(props?.richText);
+}
+
 export function convertTldrawSnapshotToShapes(snapshot: TldrawSnapshot): CanvasShape[] {
   const out: CanvasShape[] = [];
   for (const record of Object.values(snapshot.store ?? {})) {
@@ -14,14 +45,14 @@ export function convertTldrawSnapshotToShapes(snapshot: TldrawSnapshot): CanvasS
           type: "geo", id: record.id,
           x: record.x ?? 0, y: record.y ?? 0,
           w: record.props?.w ?? 1, h: record.props?.h ?? 1,
-          props: { geo: record.props?.geo ?? "rectangle", text: record.props?.text || undefined },
+          props: { geo: record.props?.geo ?? "rectangle", text: resolveText(record.props) },
         });
         break;
       case "text":
         out.push({
           type: "text", id: record.id,
           x: record.x ?? 0, y: record.y ?? 0,
-          props: { text: record.props?.text ?? "", size: record.props?.size ?? "m" },
+          props: { text: resolveText(record.props) ?? "", size: record.props?.size ?? "m" },
         });
         break;
       case "arrow":

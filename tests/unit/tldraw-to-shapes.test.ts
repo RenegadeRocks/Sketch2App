@@ -20,6 +20,40 @@ describe("convertTldrawSnapshotToShapes", () => {
     });
   });
 
+  it("extracts geo label from tldraw 4.x richText prop", () => {
+    const snapshot = {
+      store: {
+        "shape:1": {
+          id: "shape:1", typeName: "shape", type: "geo",
+          x: 0, y: 0,
+          props: {
+            w: 100, h: 40, geo: "rectangle",
+            richText: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Sign in" }] }] },
+          },
+        },
+      },
+    };
+    const shapes = convertTldrawSnapshotToShapes(snapshot);
+    expect(shapes[0]).toMatchObject({ type: "geo", props: { geo: "rectangle", text: "Sign in" } });
+  });
+
+  it("extracts text shape content from richText", () => {
+    const snapshot = {
+      store: {
+        "shape:1": {
+          id: "shape:1", typeName: "shape", type: "text",
+          x: 0, y: 0,
+          props: {
+            size: "l",
+            richText: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Welcome" }] }] },
+          },
+        },
+      },
+    };
+    const shapes = convertTldrawSnapshotToShapes(snapshot);
+    expect(shapes[0]).toMatchObject({ type: "text", props: { text: "Welcome", size: "l" } });
+  });
+
   it("skips non-shape records", () => {
     const snapshot = {
       store: {

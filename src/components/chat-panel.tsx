@@ -25,6 +25,7 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
   const { project, setProject, canvasShapes, chatHistory, appendChatMessage, markCanvasClean } = useProject();
   const [instruction, setInstruction] = useState("");
   const [busy, setBusy] = useState(false);
+  const [stage, setStage] = useState<string>("");
 
   const canGenerate = !busy && !!apiKey && (
     (mode === "canvas" && canvasShapes.length > 0) ||
@@ -34,16 +35,20 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
   const runGenerate = async () => {
     if (!apiKey) { onOpenKeyDialog(); return; }
     setBusy(true);
+    setStage(mode === "photo" ? "Reading the photo…" : "Reading your sketch…");
     try {
       let shapes = canvasShapes;
       if (mode === "photo" && photoDataUrl) {
+        setStage("Identifying shapes in the photo…");
         console.log("[sketch2app] vision step: normalizing photo → shapes");
         shapes = await normalizePhotoToShapes({ imageDataUrl: photoDataUrl, apiKey, model: model.id });
         console.log("[sketch2app] vision returned", shapes.length, "shapes", shapes);
       }
+      setStage(`Generating React components from ${shapes.length} shapes…`);
       console.log("[sketch2app] codegen step: generating with", shapes.length, "shapes");
       const result = await runCodegen({ shapes, apiKey, model: model.id });
       console.log("[sketch2app] codegen returned", result);
+      setStage("Compiling preview…");
       setProject(result);
       markCanvasClean();
       onGenerated();
@@ -55,7 +60,7 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
       else if (e?.status === 402) { toast.error("Out of OpenRouter credits — top up at openrouter.ai/credits", { duration: 10000 }); }
       else if (e?.status === 429) { toast.error("Rate limited — wait a moment.", { duration: 10000 }); }
       else { toast.error(`Generation failed: ${msg}`, { duration: 20000 }); }
-    } finally { setBusy(false); }
+    } finally { setBusy(false); setStage(""); }
   };
 
   const runIterate = async () => {
@@ -63,6 +68,7 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
     if (!project) return;
     if (!instruction.trim()) return;
     setBusy(true);
+    setStage("Applying your refinement…");
     appendChatMessage({ role: "user", content: instruction });
     try {
       const result = await runIteration({
@@ -74,7 +80,7 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
       setInstruction("");
     } catch (e: any) {
       toast.error(e?.message ?? "Iteration failed");
-    } finally { setBusy(false); }
+    } finally { setBusy(false); setStage(""); }
   };
 
   return (
@@ -93,7 +99,7 @@ export function ChatPanel({ mode, photoDataUrl, onOpenKeyDialog, onGenerated }: 
       {busy && (
         <div className="border-b-2 border-bauhaus-black bg-bauhaus-yellow px-3 py-2 flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" strokeWidth={3} />
-          <span className="bauhaus-label">Generating… this can take 30–120 seconds. Do not reload.</span>
+          <span className="bauhaus-label">{stage || "Working…"}</span>
         </div>
       )}
       <div className="flex-1 overflow-auto p-3 space-y-2 text-sm">
